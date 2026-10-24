@@ -120,7 +120,7 @@ export function TextDriftCanvas(): React.JSX.Element {
       const zoom = Math.min(visW / frameW, visH / frameH) * 100;
       if (zoom < 25) {
         // Below the runtime's minimum zoom: reshape the output frame to the screen instead
-        dispatch({ type: 'canvas.setSize', size: { width: Math.floor(visW * 4), height: Math.floor(visH * 4), unit: 'px' } });
+        dispatch({ type: 'canvas.setSize', size: { width: Math.floor(visW), height: Math.floor(visH), unit: 'px' } });
         return;
       }
       dispatch({
