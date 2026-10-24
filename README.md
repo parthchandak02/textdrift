@@ -22,9 +22,9 @@
 
 <br><br>
 
-<a href="https://textdrift.pages.dev"><img src="docs/assets/readme/hero.jpg" width="100%" alt="The words 'letters on a warm breeze' scattered as pink letters across a pale blue sky with faint cloud shapes, beside a dark controls panel with text, font size, wind multiplier, particle spread and colour mood settings"></a>
+<a href="https://textdrift.pages.dev"><img src="docs/assets/readme/hero.jpg" width="100%" alt="The words 'letters on a warm breeze' scattered as pink letters across a pale blue sky framed in black, 29.4 degrees top-right of the frame and a data stamp bottom-left, beside a dark controls panel with Color Mood set to Warm"></a>
 
-<sub>Live capture, 22 October 2026, typed text "letters on a warm breeze". Singapore was 31 °C with a 1.6 km/h wind, so the letters are warm pink and barely moving.</sub>
+<sub>Live capture, 23 October 2026, typed text "letters on a warm breeze" with Color Mood on Warm. Singapore was 29.4 °C with a 2.9 km/h wind, so the letters barely move.</sub>
 
 </div>
 
@@ -50,15 +50,12 @@ at 1.35° N, 103.82° E, and those three numbers decide how the letters look and
 | Font Size | 12 to 60 px |
 | Wind Multiplier | Scales the wind push, 0 to 3× |
 | Particle Spread | Spacing between letters, 0.5 to 3× |
+| Color Mood | Shifts the colour scale: Cool reads the temperature 6 °C colder (bluer), Warm 6 °C warmer (pinker), Mixed as measured |
 
 Each letter also bobs gently on its own. Clicking a letter shows a small panel with the
 temperature, wind speed and direction driving it. Until the first request succeeds, the page
-uses fallback values of 28 °C and a 5 km/h easterly.
-
-**Known issues.** The **Color Mood** toggle is in the panel but the renderer doesn't read it.
-The temperature headline, data stamp and caption are positioned off-screen inside the Toolcraft
-canvas frame, so they don't show up on the live site. The custom domain in the brief,
-`textdrift.parthchandak.info`, doesn't resolve; the Cloudflare Pages address above does.
+uses fallback values of 28 °C and a 5 km/h easterly. The 16:9 output frame is zoomed to fit
+the screen, so the temperature headline top-right and the data stamp bottom-left stay in view.
 
 ## Run it
 

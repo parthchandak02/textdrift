@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useToolcraftValue } from '@/toolcraft/runtime/react';
+import { useToolcraft, useToolcraftValue } from '@/toolcraft/runtime/react';
 
 interface LetterParticle {
   char: string;
@@ -42,6 +42,10 @@ function lerpColor(a: string, b: string, t: number): string {
   const rb = Math.round(ab + (bb - ab) * t);
   return `rgb(${rr},${rg},${rb})`;
 }
+
+// Color Mood shifts the temperature-to-colour scale: Cool reads every reading as
+// 6 °C colder (more blue), Warm as 6 °C warmer (more pink), Mixed uses it as is
+const MOOD_SHIFT: Record<string, number> = { cool: -6, mixed: 0, warm: 6 };
 
 function tempToColor(temp: number): string {
   if (temp <= 22) return tempColors[0].color;
@@ -89,6 +93,46 @@ export function TextDriftCanvas(): React.JSX.Element {
   const windMult = (useToolcraftValue('windMultiplier') as number) || 1;
   const spread = (useToolcraftValue('particleSpread') as number) || 1;
   const colorMood = (useToolcraftValue('colorMood') as string) || 'mixed';
+  const colorMoodRef = React.useRef(colorMood);
+  colorMoodRef.current = colorMood;
+
+  // The output frame (not the window) is the drawing surface; fit it into the viewport
+  const { dispatch, state } = useToolcraft();
+  const frameW = state.canvas.size.width;
+  const frameH = state.canvas.size.height;
+  React.useEffect(() => {
+    const fit = () => {
+      const viewport = canvasRef.current?.closest<HTMLElement>("[data-slot='toolcraft-runtime-canvas']");
+      if (!viewport || !frameW || !frameH) return;
+      // Fit into the part of the viewport actually on screen (the app shell has a minimum
+      // width, so on phones it runs past the window), left of the controls panel when there is room
+      const r = viewport.getBoundingClientRect();
+      const left = Math.max(r.left, 0);
+      const top = Math.max(r.top, 0);
+      let right = Math.min(r.right, window.innerWidth);
+      const bottom = Math.min(r.bottom, window.innerHeight);
+      const panel = document.querySelector<HTMLElement>("[data-slot='toolcraft-runtime-panel-host']");
+      const panelLeft = panel?.getBoundingClientRect().left ?? right;
+      if (panelLeft < right && panelLeft - left > 600) right = panelLeft - 12;
+      const visW = right - left;
+      const visH = bottom - top;
+      if (visW <= 0 || visH <= 0) return;
+      const zoom = Math.min(visW / frameW, visH / frameH) * 100;
+      if (zoom < 25) {
+        // Below the runtime's minimum zoom: reshape the output frame to the screen instead
+        dispatch({ type: 'canvas.setSize', size: { width: Math.floor(visW * 4), height: Math.floor(visH * 4), unit: 'px' } });
+        return;
+      }
+      dispatch({
+        type: 'canvas.setViewport',
+        offset: { x: left + visW / 2 - (r.left + r.width / 2), y: top + visH / 2 - (r.top + r.height / 2) },
+        zoom: Math.floor(zoom),
+      });
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, [dispatch, frameW, frameH]);
 
   // Fetch weather
   React.useEffect(() => {
@@ -123,8 +167,8 @@ export function TextDriftCanvas(): React.JSX.Element {
   React.useEffect(() => {
     textRef.current = userText || DEFAULT_TEXT;
     const txt = textRef.current;
-    const W = window.innerWidth;
-    const H = window.innerHeight;
+    const W = frameW || window.innerWidth;
+    const H = frameH || window.innerHeight;
     const count = txt.length;
     const s = spread || 1;
     const particles: LetterParticle[] = [];
@@ -146,7 +190,7 @@ export function TextDriftCanvas(): React.JSX.Element {
       });
     }
     particlesRef.current = particles;
-  }, [userText, fontSize, spread]);
+  }, [userText, fontSize, spread, frameW, frameH]);
 
   // Animation loop
   React.useEffect(() => {
@@ -155,21 +199,22 @@ export function TextDriftCanvas(): React.JSX.Element {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let W = window.innerWidth;
-    let H = window.innerHeight;
+    let W = 0;
+    let H = 0;
 
+    // Size the drawing buffer to the output frame the canvas sits in
     const resize = () => {
-      W = window.innerWidth;
-      H = window.innerHeight;
+      const frame = canvas.parentElement ?? canvas;
+      W = frame.clientWidth || window.innerWidth;
+      H = frame.clientHeight || window.innerHeight;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = W * dpr;
       canvas.height = H * dpr;
-      canvas.style.width = W + 'px';
-      canvas.style.height = H + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
-    window.addEventListener('resize', resize);
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(canvas.parentElement ?? canvas);
 
     const loop = (t: number) => {
       const dt = Math.min((t - timeRef.current) / 1000, 0.05);
@@ -195,7 +240,7 @@ export function TextDriftCanvas(): React.JSX.Element {
         const bob = Math.sin(p.phase) * 2;
         p.x = p.baseX + p.driftX + bob;
         p.y = p.baseY + p.driftY + Math.cos(p.phase * 0.7) * 2;
-        p.color = tempToColor(w.temp);
+        p.color = tempToColor(w.temp + (MOOD_SHIFT[colorMoodRef.current] ?? 0));
         p.size = fSize;
       }
 
@@ -244,7 +289,7 @@ export function TextDriftCanvas(): React.JSX.Element {
     animRef.current = requestAnimationFrame(loop);
     return () => {
       cancelAnimationFrame(animRef.current);
-      window.removeEventListener('resize', resize);
+      resizeObserver.disconnect();
     };
   }, [fontSize, windMult, spread]);
 
@@ -254,8 +299,11 @@ export function TextDriftCanvas(): React.JSX.Element {
     if (!rect) return;
     const cx = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const cy = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const x = cx - rect.left;
-    const y = cy - rect.top;
+    // The frame may be zoomed to fit the viewport; convert to canvas units
+    const canvasEl = canvasRef.current!;
+    const scale = rect.width / (canvasEl.clientWidth || rect.width);
+    const x = (cx - rect.left) / scale;
+    const y = (cy - rect.top) / scale;
 
     // Find closest letter
     let minDist = Infinity;
@@ -292,7 +340,7 @@ export function TextDriftCanvas(): React.JSX.Element {
     <>
       <canvas
         ref={canvasRef}
-        className="absolute inset-0"
+        className="absolute inset-0 w-full h-full"
         style={{ touchAction: 'manipulation', cursor: 'pointer' }}
         onClick={handleTap}
         onTouchStart={handleTap}

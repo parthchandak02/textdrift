@@ -98,5 +98,5 @@ toolcraft — Pixel Point Toolcraft starter, Vite build, deploy dist/
 
 ## Deploy
 - Slug: textdrift
-- URL: https://textdrift.parthchandak.info
+- URL: https://textdrift.pages.dev
 - GitHub: https://github.com/parthchandak02/textdrift
