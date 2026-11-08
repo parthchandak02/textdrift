@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "title": "Textdrift",
+  "asset": "public/toolcraft/cover.png",
+  "generation": {
+    "kind": "app-composition",
+    "source": "src/app/app-composition.tsx",
+    "state": "app-cover-state.json",
+    "description": "Actual app export (4K PNG) of the default poster: the word weather blown by the live Open-Meteo wind in Wellington on 9 November 2026, serif type, drift 1x, on paper; 16:9 output, no editor UI."
+  }
+}

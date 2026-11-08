@@ -1,95 +1,26 @@
-import { defineToolcraft } from "@/toolcraft/runtime";
+import { defineToolcraft, imageExportModule } from "@/toolcraft/runtime";
+
+import { backgroundControls, placeControls, typeControls, wordsControls } from "../textdrift/textdrift-controls";
+import appDefaults from "./app-defaults.json" with { type: "json" };
+import { appIdentity } from "./app-identity";
 
 export const appSchema = defineToolcraft({
-  canvas: {
-    enabled: true,
-    upload: false,
-    sizing: {
-      mode: 'editable-output',
+  base: {
+    canvas: { draggable: true, enabled: true, renderScale: true, size: { height: 1080, unit: "px", width: 1920 }, sizing: { mode: "editable-output" }, upload: false },
+    identity: appIdentity,
+    panels: {
+      controls: {
+        sections: [
+          { controls: backgroundControls, id: "runtime.setup", title: "Settings" },
+          { controls: wordsControls, id: "words", title: "Words" },
+          { controls: placeControls, id: "place", title: "Place" },
+          { controls: typeControls, id: "type", title: "Type" },
+        ],
+        title: "Textdrift",
+      },
     },
+    toolbar: { history: true, radar: true, theme: true, zoom: true },
   },
-  panels: {
-    controls: {
-      sections: [
-        {
-          title: "Text",
-          controls: {
-            userText: {
-              type: "text",
-              target: "userText",
-              label: "Text",
-              defaultValue: "textdrift",
-              description: "Type any words to see them drift with Singapore weather",
-            },
-          },
-        },
-        {
-          title: "Typography",
-          controls: {
-            fontSize: {
-              type: "slider",
-              target: "fontSize",
-              label: "Font Size",
-              min: 12,
-              max: 60,
-              step: 1,
-              defaultValue: 32,
-              description: "Size of the floating letters",
-            },
-          },
-        },
-        {
-          title: "Weather Effect",
-          controls: {
-            windMultiplier: {
-              type: "slider",
-              target: "windMultiplier",
-              label: "Wind Multiplier",
-              min: 0,
-              max: 3,
-              step: 0.1,
-              defaultValue: 1,
-              description: "Amplify wind effect on letter drift",
-            },
-            particleSpread: {
-              type: "slider",
-              target: "particleSpread",
-              label: "Particle Spread",
-              min: 0.5,
-              max: 3,
-              step: 0.1,
-              defaultValue: 1,
-              description: "How spread out letters appear",
-            },
-          },
-        },
-        {
-          title: "Color",
-          controls: {
-            colorMood: {
-              type: "segmented",
-              target: "colorMood",
-              label: "Color Mood",
-              options: [
-                { label: "Cool", value: "cool" },
-                { label: "Mixed", value: "mixed" },
-                { label: "Warm", value: "warm" },
-              ],
-              defaultValue: "mixed",
-              description: "Temperature color palette preference",
-            },
-          },
-        },
-      ],
-      title: "Controls",
-    },
-  },
-  toolbar: {
-    history: false,
-    radar: false,
-    zoom: false,
-  },
-  persistence: {
-    storage: "none",
-  },
+  defaults: appDefaults,
+  modules: [imageExportModule()],
 });

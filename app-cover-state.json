@@ -1,0 +1,15 @@
+{
+  "values": {
+    "appearance.background": "#EFEAE0",
+    "export.image.format": "png",
+    "export.image.resolution": "4k",
+    "export.includeBackground": true,
+    "place.latitude": -41.29,
+    "place.longitude": 174.78,
+    "type.drift": 1,
+    "type.face": "serif",
+    "words.text": "weather"
+  },
+  "canvas": { "size": { "width": 1920, "height": 1080 } },
+  "data": "Live Open-Meteo current weather for -41.29, 174.78 at capture time"
+}
