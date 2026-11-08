@@ -11,17 +11,17 @@
 ![Data](https://img.shields.io/badge/data-Open--Meteo-36a98f?style=flat-square)
 ![Canvas 2D](https://img.shields.io/badge/Canvas-2D-111111?style=flat-square)
 ![Toolcraft](https://img.shields.io/badge/Toolcraft-0.0.26-111111?style=flat-square)
-![Live](https://img.shields.io/badge/live-textdrift.pages.dev-e0a630?style=flat-square)
+![Live](https://img.shields.io/badge/live-textdrift.parthchandak.info-e0a630?style=flat-square)
 
 </h6>
 
-<a href="https://textdrift.pages.dev"><b>Live app</b></a> ·
+<a href="https://textdrift.parthchandak.info"><b>Live app</b></a> ·
 <a href="#how-it-works"><b>How it works</b></a> ·
 <a href="#run-it"><b>Run it</b></a>
 
 <br><br>
 
-<a href="https://textdrift.pages.dev"><img src="docs/assets/readme/hero.jpg" width="100%" alt="A paper-coloured poster: the word weather in large green serif letters, each pushed up and to the left by a 27 km/h wind from the south-south-east, tilted and trailed by fading copies; above, TEXTDRIFT, Wellington, local 12:30; below, a green temperature chip with 15.5 °C, feels like 12 °C, wind 27 km/h with gusts of 58, no rain, 78% humidity and 96% cloud"></a>
+<a href="https://textdrift.parthchandak.info"><img src="docs/assets/readme/hero.jpg" width="100%" alt="A paper-coloured poster: the word weather in large green serif letters, each pushed up and to the left by a 27 km/h wind from the south-south-east, tilted and trailed by fading copies; above, TEXTDRIFT, Wellington, local 12:30; below, a green temperature chip with 15.5 °C, feels like 12 °C, wind 27 km/h with gusts of 58, no rain, 78% humidity and 96% cloud"></a>
 
 <sub>The default poster: Wellington's wind.</sub>
 
